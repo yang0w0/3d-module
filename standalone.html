@@ -1,0 +1,2463 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>百草姓 3D 萌物工坊 - 单文件版</title>
+  <style>
+:root {
+  color-scheme: light;
+  --bg: #fbf3e1;
+  --paper: #fffaf0;
+  --paper-2: #fff3da;
+  --panel: rgba(255, 250, 240, .94);
+  --panel-2: #fff0d1;
+  --ink: #433526;
+  --text: #3c3024;
+  --muted: #8c7358;
+  --line: #e3cda9;
+  --line-strong: #cfa671;
+  --jade: #4fa487;
+  --jade-dark: #2f735f;
+  --cinnabar: #c84f3d;
+  --peach: #f0a98f;
+  --gold: #d8a848;
+  --leaf: #7fa75a;
+  --danger: #b83f3f;
+  --shadow: 0 18px 45px rgba(116, 74, 34, .14);
+  --soft-shadow: 0 8px 20px rgba(126, 87, 45, .12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(200, 79, 61, .08) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(200, 79, 61, .06) 1px, transparent 1px),
+    linear-gradient(135deg, #fff7e8 0%, var(--bg) 44%, #f6e5c7 100%);
+  background-size: 38px 38px, 38px 38px, auto;
+  color: var(--text);
+  font: 14px/1.5 "Microsoft YaHei UI", "PingFang SC", "Hiragino Sans GB", system-ui, -apple-system, sans-serif;
+  letter-spacing: 0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 42px, rgba(140, 115, 88, .05) 42px 43px),
+    linear-gradient(180deg, rgba(255, 255, 255, .48), transparent 32%);
+  mix-blend-mode: multiply;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #fffdf7, #fff0d2);
+  color: var(--ink);
+  border-radius: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(111, 72, 33, .12);
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--cinnabar);
+  box-shadow: 0 5px 14px rgba(166, 81, 53, .16);
+  transform: translateY(-1px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+  transform: none;
+  box-shadow: none;
+}
+
+button:focus-visible,
+.td-link-button:focus-visible {
+  outline: 3px solid rgba(79, 164, 135, .34);
+  outline-offset: 2px;
+}
+
+.td-shell {
+  min-height: 100vh;
+  padding: 22px;
+  position: relative;
+}
+
+.td-shell::before,
+.td-shell::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: .42;
+}
+
+.td-shell::before {
+  width: 260px;
+  height: 260px;
+  left: 18px;
+  top: 22px;
+  background:
+    linear-gradient(135deg, transparent 44%, rgba(79, 164, 135, .22) 45% 56%, transparent 57%),
+    linear-gradient(45deg, transparent 44%, rgba(200, 79, 61, .16) 45% 56%, transparent 57%);
+  border-radius: 48% 52% 54% 46%;
+  filter: blur(.1px);
+}
+
+.td-shell::after {
+  right: 24px;
+  bottom: 28px;
+  width: 180px;
+  height: 180px;
+  border: 22px double rgba(216, 168, 72, .2);
+  border-radius: 50%;
+}
+
+.td-shell.is-panel {
+  padding: 0;
+}
+
+.td-shell.is-panel [data-standalone] {
+  display: none;
+}
+
+.td-topbar,
+.td-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.td-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin: 0 auto 18px;
+  max-width: 1480px;
+  padding: 18px 20px;
+  border: 1px solid rgba(207, 166, 113, .65);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 250, 240, .94), rgba(255, 239, 210, .82)),
+    repeating-linear-gradient(135deg, rgba(79, 164, 135, .08) 0 8px, transparent 8px 18px);
+  box-shadow: var(--soft-shadow);
+}
+
+.td-kicker {
+  margin: 0 0 4px;
+  color: var(--jade-dark);
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 850;
+  color: var(--ink);
+}
+
+.td-subtitle {
+  max-width: 620px;
+  margin: 6px 0 0;
+  color: var(--muted);
+}
+
+.td-link-button,
+.td-primary {
+  border: 0;
+  background: linear-gradient(180deg, #df684d, var(--cinnabar));
+  color: #fffaf2;
+  font-weight: 760;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  box-shadow: 0 9px 18px rgba(200, 79, 61, .22), inset 0 1px 0 rgba(255, 255, 255, .32);
+}
+
+.td-link-button {
+  white-space: nowrap;
+}
+
+.td-link-button:hover,
+.td-primary:hover {
+  border-color: transparent;
+  box-shadow: 0 12px 24px rgba(200, 79, 61, .28), inset 0 1px 0 rgba(255, 255, 255, .34);
+}
+
+.td-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, 400px) minmax(680px, 1fr) minmax(220px, 270px);
+  gap: 16px;
+  max-width: none;
+  margin: 0 auto;
+}
+
+.td-grid.history-collapsed {
+  grid-template-columns: minmax(300px, 400px) minmax(860px, 1fr);
+}
+
+.td-panel,
+.td-stage {
+  background: var(--panel);
+  border: 1px solid rgba(207, 166, 113, .72);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
+}
+
+.td-controls {
+  min-height: 860px;
+  overflow: hidden;
+}
+
+.td-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, #fffaf0, #fbe9c7),
+    repeating-linear-gradient(90deg, rgba(216, 168, 72, .12) 0 2px, transparent 2px 14px);
+}
+
+.td-tabs button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  min-height: 48px;
+  padding: 13px 6px;
+  box-shadow: none;
+}
+
+.td-tabs button:hover {
+  transform: none;
+  color: var(--cinnabar);
+  box-shadow: inset 0 -2px 0 rgba(200, 79, 61, .45);
+}
+
+.td-tabs button.is-active {
+  color: var(--ink);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .8), rgba(255, 240, 209, .95));
+  box-shadow: inset 0 -3px 0 var(--cinnabar);
+  font-weight: 780;
+}
+
+.td-tab-panel {
+  display: none;
+  padding: 16px;
+}
+
+.td-tab-panel.is-active {
+  display: block;
+}
+
+.td-dropzone {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 220px;
+  padding: 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .72), rgba(255, 244, 220, .92)),
+    repeating-linear-gradient(45deg, rgba(127, 167, 90, .12) 0 7px, transparent 7px 18px);
+  text-align: center;
+  cursor: pointer;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 4px rgba(255, 255, 255, .38);
+}
+
+.td-dropzone:hover,
+.td-dropzone.is-dragging,
+.td-file-row:hover {
+  border-color: var(--jade);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .84), rgba(238, 247, 225, .92)),
+    repeating-linear-gradient(45deg, rgba(79, 164, 135, .14) 0 7px, transparent 7px 18px);
+}
+
+.td-dropzone input,
+.td-file-row input {
+  display: none;
+}
+
+.td-dropzone span {
+  font-size: 16px;
+  font-weight: 820;
+}
+
+.td-dropzone small,
+.td-status,
+.td-settings p,
+.td-metrics dt,
+.td-history-item small {
+  color: var(--muted);
+}
+
+.td-dropzone img {
+  display: none;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #fffdf7;
+  border: 1px solid rgba(207, 166, 113, .54);
+}
+
+.td-dropzone.has-image img {
+  display: block;
+}
+
+.td-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf7;
+  color: var(--ink);
+  padding: 10px;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(126, 87, 45, .08);
+}
+
+input:focus,
+select:focus {
+  border-color: var(--jade);
+  box-shadow: 0 0 0 3px rgba(79, 164, 135, .16), inset 0 1px 2px rgba(126, 87, 45, .08);
+}
+
+input:disabled {
+  color: rgba(67, 53, 38, .62);
+  background: #f4e4c7;
+}
+
+.td-cost {
+  margin: 14px 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--gold);
+  background: #fff1ca;
+  color: #7a5720;
+  border-radius: 0 8px 8px 0;
+  box-shadow: inset 0 0 0 1px rgba(216, 168, 72, .16);
+}
+
+.td-relief-box {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(207, 166, 113, .72);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 253, 247, .94), rgba(255, 240, 218, .88));
+}
+
+.td-relief-box strong {
+  color: var(--ink);
+}
+
+.td-status {
+  min-height: 42px;
+  margin: 12px 0 0;
+}
+
+.td-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.td-actions button {
+  flex: 1 1 124px;
+}
+
+.td-file-row {
+  min-height: 92px;
+  padding: 16px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  place-items: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(255, 244, 220, .9));
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.td-metrics {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+}
+
+.td-metrics div {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 8px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.td-metrics dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+
+.td-settings code {
+  display: inline;
+  padding: 2px 5px;
+  border-radius: 5px;
+  background: #fff1ca;
+  color: var(--jade-dark);
+}
+
+.td-config-box {
+  display: block;
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 253, 247, .78);
+  border: 1px solid var(--line);
+}
+
+.td-config-box strong {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--ink);
+}
+
+.td-config-box label + label {
+  margin-top: 10px;
+}
+
+.td-config-box label[hidden] {
+  display: none;
+}
+
+.td-field-hint {
+  margin: 8px 0 12px;
+  padding: 9px 10px;
+  border-left: 4px solid var(--jade);
+  background: #eef4de;
+  color: #5f7141;
+  border-radius: 0 8px 8px 0;
+}
+
+.td-local-contract {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.td-local-contract span {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: #fffdf7;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  overflow-wrap: anywhere;
+  border: 1px solid rgba(227, 205, 169, .78);
+}
+
+.td-stage,
+.td-history-panel {
+  min-height: 860px;
+}
+
+.td-stage {
+  overflow: hidden;
+}
+
+.td-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 54px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  gap: 10px;
+  background:
+    linear-gradient(90deg, #fff8eb, #fff0d4),
+    repeating-linear-gradient(90deg, rgba(200, 79, 61, .1) 0 1px, transparent 1px 16px);
+}
+
+.td-toolbar strong,
+.td-history-head strong {
+  color: var(--ink);
+}
+
+#stageBadge {
+  color: var(--jade-dark);
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(79, 164, 135, .13);
+  border: 1px solid rgba(79, 164, 135, .24);
+}
+
+.td-history-restore {
+  display: none;
+  min-height: 40px;
+  padding: 8px 11px;
+}
+
+.td-grid.history-collapsed .td-history-restore {
+  display: inline-flex;
+}
+
+.td-viewport {
+  width: 100%;
+  height: min(82vh, 900px);
+  min-height: 640px;
+  background:
+    linear-gradient(180deg, rgba(255, 250, 240, .78) 0%, rgba(238, 247, 225, .72) 42%, rgba(244, 224, 188, .86) 100%),
+    repeating-linear-gradient(90deg, rgba(79, 164, 135, .08) 0 1px, transparent 1px 34px);
+}
+
+.td-history-panel {
+  padding: 12px 16px 16px;
+  max-height: 860px;
+  overflow: auto;
+}
+
+.td-grid.history-collapsed .td-history-panel {
+  display: none;
+}
+
+.td-history-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.td-history-tools {
+  display: flex;
+  gap: 6px;
+}
+
+.td-history-tools button {
+  min-height: 38px;
+  padding: 8px 10px;
+  white-space: nowrap;
+}
+
+.td-history-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.td-history-item {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  min-height: 60px;
+  background: rgba(255, 253, 247, .88);
+}
+
+.td-thumb {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, var(--jade), var(--leaf) 48%, var(--gold));
+  border: 1px solid rgba(207, 166, 113, .62);
+}
+
+@media (max-width: 1100px) {
+  .td-grid,
+  .td-grid.history-collapsed {
+    grid-template-columns: minmax(300px, 390px) minmax(540px, 1fr);
+  }
+
+  .td-history-panel {
+    display: none;
+  }
+
+  .td-history-restore {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 900px) {
+  .td-shell {
+    padding: 10px;
+  }
+
+  .td-topbar,
+  .td-grid,
+  .td-grid.history-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .td-topbar {
+    align-items: start;
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 25px;
+  }
+
+  .td-controls,
+  .td-stage,
+  .td-history-panel {
+    min-height: auto;
+  }
+
+  .td-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .td-tabs {
+    grid-template-columns: repeat(5, minmax(52px, 1fr));
+  }
+
+  .td-tabs button {
+    padding: 12px 4px;
+  }
+
+  .td-toolbar {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 54px;
+    padding: 10px 12px;
+  }
+
+  #stageBadge {
+    margin-left: 0;
+  }
+
+  .td-viewport {
+    height: 70vh;
+    min-height: 460px;
+  }
+}
+
+  </style>
+<script>
+    if (location.protocol === "file:" && !location.pathname.endsWith("standalone.html")) {
+      location.replace("./standalone.html" + location.search + location.hash);
+    }
+  </script>
+  </head>
+<body>
+  <main class="td-shell" id="tdStudio">
+    <header class="td-topbar" data-standalone>
+      <div>
+        <p class="td-kicker">Baicaoxing 3D Atelier</p>
+        <h1>百草姓 3D 萌物工坊</h1>
+        <p class="td-subtitle">把草木灵感、姓氏小像和卡牌浮雕，变成可以预览、修复与打印的 Q 版模型。</p>
+      </div>
+      <a class="td-link-button" href="https://3d.hunyuan.tencent.com" target="_blank" rel="noreferrer">混元 3D 入口</a>
+    </header>
+
+    <section class="td-grid">
+      <aside class="td-panel td-controls">
+        <nav class="td-tabs" aria-label="工作区">
+          <button class="is-active" data-tab="generate">生成</button>
+          <button data-tab="preview">预览</button>
+          <button data-tab="repair">修复</button>
+          <button data-tab="export">导出</button>
+          <button data-tab="settings">设置</button>
+        </nav>
+
+        <section class="td-tab-panel is-active" data-panel="generate">
+          <label class="td-dropzone" id="imageDrop">
+            <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp">
+            <span>放入一张百草小像参考图</span>
+            <small>jpg / png / webp，单边 128~5000px，最大 6MB</small>
+            <img id="imagePreview" alt="">
+          </label>
+
+          <div class="td-form-grid">
+            <label>生成源
+              <select id="providerSelect">
+                <option value="hunyuan">混元 API</option>
+                <option value="local">自定义/本地 API</option>
+              </select>
+            </label>
+            <label>模型版本
+              <select id="modelVersion">
+                <option value="3.1">3.1</option>
+                <option value="3.0">3.0</option>
+              </select>
+            </label>
+            <label>生成类型
+              <select id="generateType">
+                <option value="Geometry">Geometry 白模，15 积分</option>
+                <option value="Normal">Normal 纹理，25 积分</option>
+                <option value="LowPoly">LowPoly，30 积分</option>
+              </select>
+            </label>
+            <label>面数
+              <input id="faceCount" type="number" min="3000" max="1500000" step="1000" value="100000">
+            </label>
+            <label>目标结果
+              <input value="GLB + STL" disabled>
+            </label>
+          </div>
+
+          <div class="td-cost" id="costHint">预计消耗：15 积分</div>
+          <button class="td-primary" id="submitJob">提交生成</button>
+          <div class="td-relief-box">
+            <strong>百草卡牌浮雕</strong>
+            <div class="td-form-grid">
+              <label>卡宽 mm
+                <input id="reliefWidth" type="number" min="20" max="180" step="1" value="63">
+              </label>
+              <label>浮雕高度 mm
+                <input id="reliefHeight" type="number" min="0.2" max="5" step="0.1" value="1.2">
+              </label>
+            </div>
+            <button id="createRelief">生成浮雕卡牌</button>
+          </div>
+          <p class="td-status" id="jobStatus">等待参考图。可以先用示例模型看看预览效果。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="preview">
+          <label class="td-file-row">
+            加载模型文件
+            <input id="modelInput" type="file" accept=".glb,.gltf,.stl,.obj,model/gltf-binary">
+          </label>
+          <div class="td-actions">
+            <button id="resetView" title="重置视角">重置视角</button>
+            <button id="toggleWire" title="切换线框">线框</button>
+            <button id="loadSample" title="载入示例几何">百草示例</button>
+          </div>
+          <dl class="td-metrics">
+            <div><dt>文件</dt><dd id="metricName">未加载</dd></div>
+            <div><dt>包围盒</dt><dd id="metricSize">-</dd></div>
+            <div><dt>三角面</dt><dd id="metricFaces">-</dd></div>
+          </dl>
+        </section>
+
+        <section class="td-tab-panel" data-panel="repair">
+          <div class="td-actions">
+            <button id="checkMesh">水密检测</button>
+            <button id="repairMesh">一键修复</button>
+          </div>
+          <p class="td-status" id="repairStatus">加载模型后可检测。浏览器版 manifold 修复预留，当前先提供边计数检测与几何清理。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="export">
+          <div class="td-form-grid">
+            <label>定尺寸轴
+              <select id="scaleAxis">
+                <option value="y">高度 Y</option>
+                <option value="x">宽度 X</option>
+                <option value="z">深度 Z</option>
+                <option value="max">最长边</option>
+              </select>
+            </label>
+            <label>目标尺寸 mm
+              <input id="targetSize" type="number" min="1" step="1" value="50">
+            </label>
+          </div>
+          <div class="td-actions">
+            <button id="applyScale">应用缩放</button>
+            <button class="td-primary" id="exportStl">导出 STL</button>
+          </div>
+          <p class="td-status">FDM 0.4mm 以下细节通常打不出；空壳模型打印前需要确认壁厚。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="settings">
+          <div class="td-settings">
+            <p id="keyState">正在检查配置...</p>
+            <div class="td-config-box">
+              <strong>混元 API</strong>
+              <label>SecretId
+                <input id="secretIdInput" type="password" autocomplete="off" placeholder="腾讯云 CAM SecretId">
+              </label>
+              <label>SecretKey
+                <input id="secretKeyInput" type="password" autocomplete="off" placeholder="腾讯云 CAM SecretKey">
+              </label>
+            </div>
+            <div class="td-config-box">
+              <strong>自定义/本地 API</strong>
+              <label>接口类型
+                <select id="localPresetSelect">
+                  <option value="local-default">通用本地生成服务</option>
+                  <option value="hunyuan3d-local">本地 Hunyuan3D 包装服务</option>
+                  <option value="comfyui-proxy">ComfyUI 包装代理</option>
+                  <option value="sd-webui-proxy">SD WebUI / TripoSR 包装代理</option>
+                  <option value="openai-compatible">OpenAI 兼容 3D 代理</option>
+                  <option value="custom">完全自定义 HTTP 接口</option>
+                </select>
+              </label>
+              <p class="td-field-hint" id="localPresetHint"></p>
+              <label data-local-field="endpoint">服务地址
+                <input id="localEndpointInput" autocomplete="off" placeholder="http://localhost:8000 或 https://api.example.com">
+              </label>
+              <label data-local-field="submitPath">提交接口
+                <input id="localSubmitPathInput" autocomplete="off" placeholder="/generate">
+              </label>
+              <label data-local-field="taskPath">查询接口
+                <input id="localTaskPathInput" autocomplete="off" placeholder="/tasks/{taskId}">
+              </label>
+              <label data-local-field="authHeaderName">认证 Header 名
+                <input id="localAuthHeaderInput" autocomplete="off" placeholder="Authorization 或 X-API-Key">
+              </label>
+              <label data-local-field="authToken">API Key / Token
+                <input id="localAuthTokenInput" type="password" autocomplete="off" placeholder="你的接口密钥">
+              </label>
+              <label data-local-field="authScheme">认证前缀
+                <input id="localAuthSchemeInput" autocomplete="off" placeholder="Bearer；使用 X-API-Key 时可留空">
+              </label>
+            </div>
+            <div class="td-actions">
+              <button class="td-primary" id="saveConfig">保存配置</button>
+              <button id="clearConfig">清空浏览器配置</button>
+            </div>
+            <p>双击 <code>standalone.html</code> 打开时，配置和生成历史会保存在当前浏览器；通过启动脚本打开时，还会同步保存到本机 <code>local-data</code>。如果你要分享文件夹，请不要带上 <code>local-data</code> 或密钥文件。</p>
+            <div class="td-local-contract">
+              <strong id="localContractTitle">当前接口需要填写</strong>
+              <span id="localContractSubmit">POST /generate</span>
+              <span id="localContractTask">GET /tasks/{taskId}</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="td-stage">
+        <div class="td-toolbar">
+          <strong id="stageTitle">萌物预览</strong>
+          <span id="stageBadge">GLB / STL / OBJ</span>
+          <button id="showHistory" class="td-history-restore" title="展开生成历史">展开历史</button>
+        </div>
+        <div id="viewport" class="td-viewport" aria-label="3D 模型预览"></div>
+      </section>
+
+      <aside class="td-panel td-history-panel" id="historyPanel">
+        <div class="td-history-head">
+          <strong>生成历史</strong>
+          <div class="td-history-tools">
+            <button id="toggleHistory" title="收起/展开历史">收起</button>
+            <button id="clearHistory">清空</button>
+          </div>
+        </div>
+        <div id="historyList" class="td-history-list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <template id="historyItemTemplate">
+    <button class="td-history-item">
+      <span class="td-thumb"></span>
+      <span>
+        <strong></strong>
+        <small></small>
+      </span>
+    </button>
+  </template>
+
+  <script type="module">
+import * as THREE from "https://unpkg.com/three@0.169.0/build/three.module.js";
+import { OrbitControls } from "https://unpkg.com/three@0.169.0/examples/jsm/controls/OrbitControls.js";
+import { GLTFLoader } from "https://unpkg.com/three@0.169.0/examples/jsm/loaders/GLTFLoader.js";
+import { STLLoader } from "https://unpkg.com/three@0.169.0/examples/jsm/loaders/STLLoader.js";
+import { OBJLoader } from "https://unpkg.com/three@0.169.0/examples/jsm/loaders/OBJLoader.js";
+import { RoomEnvironment } from "https://unpkg.com/three@0.169.0/examples/jsm/environments/RoomEnvironment.js";
+import { STLExporter } from "https://unpkg.com/three@0.169.0/examples/jsm/exporters/STLExporter.js";
+
+/* src/storage.js */
+const PREFIX = "td-studio:";
+const HAS_LOCAL_SERVER = location.protocol === "http:" || location.protocol === "https:";
+
+function readSetting(key, fallback = null) {
+  try {
+    const value = localStorage.getItem(PREFIX + key);
+    return value == null ? fallback : JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function writeSetting(key, value) {
+  localStorage.setItem(PREFIX + key, JSON.stringify(value));
+}
+
+async function readServerData(path, key) {
+  if (!HAS_LOCAL_SERVER) return null;
+  try {
+    const response = await fetch(`./api/${path}`, { cache: "no-store" });
+    if (!response.ok) return null;
+    const data = await response.json();
+    return {
+      exists: Boolean(data.exists),
+      value: data[key]
+    };
+  } catch {
+    return null;
+  }
+}
+
+async function writeServerData(path, key, value) {
+  if (!HAS_LOCAL_SERVER) return false;
+  const response = await fetch(`./api/${path}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ [key]: value })
+  });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.message || `本机缓存保存失败：HTTP ${response.status}`);
+  }
+  return true;
+}
+
+function hasStoredValue(value) {
+  if (Array.isArray(value)) return value.length > 0;
+  if (value && typeof value === "object") return Object.keys(value).length > 0;
+  return value != null && value !== "";
+}
+
+async function readRuntimeConfig(fallback = {}) {
+  const browserConfig = readSetting("runtimeConfig", fallback);
+  const serverData = await readServerData("runtime-config", "config");
+  if (serverData != null) {
+    const serverConfig = serverData.value || {};
+    if (!serverData.exists && !hasStoredValue(serverConfig) && hasStoredValue(browserConfig)) {
+      await writeServerData("runtime-config", "config", browserConfig).catch(() => {});
+      return browserConfig;
+    }
+    writeSetting("runtimeConfig", serverConfig);
+    return serverConfig;
+  }
+  return browserConfig;
+}
+
+async function writeRuntimeConfig(config) {
+  writeSetting("runtimeConfig", config);
+  return writeServerData("runtime-config", "config", config);
+}
+
+async function readHistory() {
+  const browserHistory = readSetting("history", []);
+  const serverData = await readServerData("history", "history");
+  if (serverData != null) {
+    const serverHistory = Array.isArray(serverData.value) ? serverData.value : [];
+    if (!serverData.exists && !hasStoredValue(serverHistory) && hasStoredValue(browserHistory)) {
+      await writeServerData("history", "history", browserHistory).catch(() => {});
+      return browserHistory;
+    }
+    writeSetting("history", serverHistory);
+    return serverHistory;
+  }
+  return browserHistory;
+}
+
+async function addHistory(item) {
+  const history = await readHistory();
+  const nextHistory = [{ ...item, savedAt: Date.now() }, ...history].slice(0, 20);
+  writeSetting("history", nextHistory);
+  await writeServerData("history", "history", nextHistory).catch(() => {});
+  return nextHistory;
+}
+
+async function clearHistory() {
+  writeSetting("history", []);
+  await writeServerData("history", "history", []).catch(() => {});
+}
+
+
+/* src/hunyuan-client.js */
+const DEFAULT_CONFIG = {
+  region: "ap-guangzhou",
+  service: "ai3d",
+  host: "ai3d.tencentcloudapi.com",
+  version: "2025-05-13"
+};
+
+const COSTS = {
+  Normal: 25,
+  Geometry: 15,
+  LowPoly: 30,
+  Sketch: 25
+};
+
+function getHunyuanConfig() {
+  return { ...DEFAULT_CONFIG, ...(window.TD_STUDIO_CONFIG || {}), ...readBrowserConfig() };
+}
+
+function getGenerationCost(generateType) {
+  return COSTS[generateType] || COSTS.Geometry;
+}
+
+function hasApiKeys() {
+  const cfg = getHunyuanConfig();
+  return Boolean(cfg.tencentSecretId && cfg.tencentSecretKey);
+}
+
+async function submitHunyuanJob({ imageBase64, model, generateType, faceCount }) {
+  const cfg = getHunyuanConfig();
+  if (!hasApiKeys()) {
+    const error = new Error("未配置混元 API 密钥。请在设置里填写 SecretId 和 SecretKey 后再提交。");
+    error.code = "NO_KEY";
+    throw error;
+  }
+
+  const payload = {
+    ImageBase64: imageBase64.replace(/^data:image\/\w+;base64,/, ""),
+    Model: model,
+    GenerateType: generateType,
+    FaceCount: Number(faceCount) || 100000,
+    ResultFormat: "STL"
+  };
+
+  return tc3Fetch(cfg, "SubmitHunyuanTo3DProJob", payload);
+}
+
+async function queryHunyuanJob(jobId) {
+  const cfg = getHunyuanConfig();
+  return tc3Fetch(cfg, "QueryHunyuanTo3DProJob", { JobId: jobId });
+}
+
+async function pollHunyuanJob(jobId, onProgress) {
+  const started = Date.now();
+  while (Date.now() - started < 15 * 60 * 1000) {
+    await sleep(4000);
+    const response = await queryHunyuanJob(jobId);
+    onProgress?.(response);
+    if (response.Status === "DONE" || response.Status === "FAIL") return response;
+  }
+  throw new Error("生成等待超时，请稍后在腾讯云控制台确认任务状态。");
+}
+
+async function tc3Fetch(cfg, action, payloadObject) {
+  const payload = JSON.stringify(payloadObject);
+  const timestamp = Math.floor(Date.now() / 1000);
+  const date = new Date(timestamp * 1000).toISOString().slice(0, 10);
+  const canonicalHeaders = [
+    "content-type:application/json; charset=utf-8",
+    `host:${cfg.host}`,
+    `x-tc-action:${action.toLowerCase()}`,
+    ""
+  ].join("\n");
+  const signedHeaders = "content-type;host;x-tc-action";
+  const canonicalRequest = [
+    "POST",
+    "/",
+    "",
+    canonicalHeaders,
+    signedHeaders,
+    await sha256Hex(payload)
+  ].join("\n");
+  const credentialScope = `${date}/${cfg.service}/tc3_request`;
+  const stringToSign = [
+    "TC3-HMAC-SHA256",
+    timestamp,
+    credentialScope,
+    await sha256Hex(canonicalRequest)
+  ].join("\n");
+  const kDate = await hmac(`TC3${cfg.tencentSecretKey}`, date);
+  const kService = await hmac(kDate, cfg.service);
+  const kSigning = await hmac(kService, "tc3_request");
+  const signature = await hmacHex(kSigning, stringToSign);
+  const authorization = [
+    `TC3-HMAC-SHA256 Credential=${cfg.tencentSecretId}/${credentialScope}`,
+    `SignedHeaders=${signedHeaders}`,
+    `Signature=${signature}`
+  ].join(", ");
+
+  const response = await fetch(`https://${cfg.host}/`, {
+    method: "POST",
+    headers: {
+      Authorization: authorization,
+      "Content-Type": "application/json; charset=utf-8",
+      "X-TC-Action": action,
+      "X-TC-Version": cfg.version,
+      "X-TC-Timestamp": String(timestamp),
+      "X-TC-Region": cfg.region
+    },
+    body: payload
+  });
+  const data = await response.json().catch(() => ({}));
+  const result = data.Response || {};
+  if (result.Error) {
+    const error = new Error(`${result.Error.Code}: ${result.Error.Message}`);
+    error.code = result.Error.Code;
+    throw error;
+  }
+  return result;
+}
+
+async function sha256Hex(value) {
+  const bytes = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest("SHA-256", bytes);
+  return toHex(hash);
+}
+
+async function hmac(key, value) {
+  const rawKey = typeof key === "string" ? new TextEncoder().encode(key) : key;
+  const cryptoKey = await crypto.subtle.importKey("raw", rawKey, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(value));
+}
+
+async function hmacHex(key, value) {
+  return toHex(await hmac(key, value));
+}
+
+function toHex(buffer) {
+  return [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function readBrowserConfig() {
+  try {
+    return JSON.parse(localStorage.getItem("td-studio:runtimeConfig") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+
+/* src/providers/local-provider.js */
+const DEFAULT_LOCAL = {
+  endpoint: "http://localhost:8000",
+  submitPath: "/generate",
+  taskPath: "/tasks/{taskId}",
+  authHeaderName: "",
+  authToken: "",
+  authScheme: "Bearer",
+  pollIntervalMs: 3000,
+  timeoutMs: 30 * 60 * 1000
+};
+
+const finished = new Map();
+
+function getLocalProviderConfig() {
+  const config = { ...(window.TD_STUDIO_CONFIG || {}), ...readLocalBrowserConfig() };
+  return { ...DEFAULT_LOCAL, ...(config.localProvider || {}) };
+}
+
+function hasLocalProvider() {
+  return Boolean(getLocalProviderConfig().endpoint);
+}
+
+async function submitLocalGeneration({ imageDataUrl, imageName, options }) {
+  const cfg = getLocalProviderConfig();
+  const form = new FormData();
+  form.append("image", dataUrlToBlob(imageDataUrl), imageName || "reference.png");
+  form.append("options", JSON.stringify({
+    source: "td-studio",
+    targetFormats: ["glb", "stl"],
+    model: options.model,
+    generateType: options.generateType,
+    faceCount: Number(options.faceCount) || 100000
+  }));
+
+  const response = await fetch(joinUrl(cfg.endpoint, cfg.submitPath), {
+    method: "POST",
+    headers: authHeaders(cfg),
+    body: form
+  });
+  const data = await readJson(response);
+  if (!response.ok) throw new Error(data.message || data.error || `本地服务提交失败：HTTP ${response.status}`);
+
+  const taskId = data.taskId || data.task_id || data.id || data.jobId || data.job_id;
+  if (!taskId) throw new Error("本地服务没有返回 taskId。");
+  const normalized = normalizeLocalTask(data);
+  if (normalized.status === "DONE") finished.set(taskId, normalized);
+  return { taskId, raw: data };
+}
+
+async function queryLocalGeneration(taskId) {
+  const cfg = getLocalProviderConfig();
+  if (finished.has(taskId)) return finished.get(taskId);
+  const path = cfg.taskPath.replace("{taskId}", encodeURIComponent(taskId));
+  const response = await fetch(joinUrl(cfg.endpoint, path), {
+    headers: authHeaders(cfg)
+  });
+  const data = await readJson(response);
+  if (!response.ok) throw new Error(data.message || data.error || `本地服务查询失败：HTTP ${response.status}`);
+  return normalizeLocalTask(data);
+}
+
+async function pollLocalGeneration(taskId, onProgress) {
+  const cfg = getLocalProviderConfig();
+  const started = Date.now();
+  while (Date.now() - started < cfg.timeoutMs) {
+    const result = await queryLocalGeneration(taskId);
+    onProgress?.(result);
+    if (result.status === "DONE" || result.status === "FAIL") return result;
+    await sleepLocal(cfg.pollIntervalMs);
+  }
+  throw new Error("本地开源生成等待超时，请检查 localhost 服务是否仍在运行。");
+}
+
+function normalizeLocalTask(data) {
+  const body = data.data || data.task || data;
+  const statusText = String(body.status || body.state || data.status || "").toLowerCase();
+  const output = body.output || body.result || data.output || {};
+  const glbUrl = body.glbUrl || body.glb_url || body.modelUrl || body.model_url || output.glbUrl || output.glb_url || output.modelUrl || output.model_url || output.model_url_glb || "";
+  const stlUrl = body.stlUrl || body.stl_url || output.stlUrl || output.stl_url || output.model_url_stl || "";
+  const error = body.error || body.message || data.error || data.message || "";
+
+  let status = "RUN";
+  if (["queued", "pending", "wait", "waiting"].includes(statusText)) status = "WAIT";
+  if (["success", "succeeded", "done", "completed", "complete", "finished"].includes(statusText) || glbUrl || stlUrl) status = "DONE";
+  if (["fail", "failed", "error", "cancelled", "canceled"].includes(statusText)) status = "FAIL";
+
+  return {
+    Status: status,
+    status,
+    progress: Number(body.progress ?? data.progress ?? 0),
+    glbUrl: absolutize(glbUrl),
+    stlUrl: absolutize(stlUrl),
+    error,
+    raw: data
+  };
+}
+
+function dataUrlToBlob(dataUrl) {
+  const [meta, base64] = dataUrl.split(",");
+  const mime = /data:([^;]+)/.exec(meta)?.[1] || "image/png";
+  const bytes = atob(base64);
+  const array = new Uint8Array(bytes.length);
+  for (let i = 0; i < bytes.length; i += 1) array[i] = bytes.charCodeAt(i);
+  return new Blob([array], { type: mime });
+}
+
+async function readJson(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { message: text };
+  }
+}
+
+function joinUrl(base, path) {
+  return `${String(base).replace(/\/$/, "")}/${String(path).replace(/^\//, "")}`;
+}
+
+function authHeaders(cfg) {
+  if (!cfg.authHeaderName || !cfg.authToken) return {};
+  const scheme = String(cfg.authScheme || "").trim();
+  const token = String(cfg.authToken).trim();
+  return {
+    [cfg.authHeaderName.trim()]: scheme ? `${scheme} ${token}` : token
+  };
+}
+
+function absolutize(url) {
+  if (!url) return "";
+  if (/^https?:\/\//i.test(url) || url.startsWith("blob:")) return url;
+  const cfg = getLocalProviderConfig();
+  return joinUrl(cfg.endpoint, url);
+}
+
+function sleepLocal(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function readLocalBrowserConfig() {
+  try {
+    return JSON.parse(localStorage.getItem("td-studio:runtimeConfig") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+
+/* src/providers/index.js */
+const PROVIDERS = [
+  {
+    id: "hunyuan",
+    label: "混元 API",
+    costLabel: (generateType) => `${getGenerationCost(generateType)} 积分`,
+    isConfigured: hasApiKeys,
+    submit: async ({ imageDataUrl, options }) => {
+      const result = await submitHunyuanJob({
+        imageBase64: imageDataUrl,
+        model: options.model,
+        generateType: options.generateType,
+        faceCount: options.faceCount
+      });
+      return { taskId: result.JobId, raw: result };
+    },
+    poll: async (taskId, onProgress) => {
+      const done = await pollHunyuanJob(taskId, onProgress);
+      const files = done.ResultFile3Ds || [];
+      const glb = files.find((file) => String(file.Type).toLowerCase() === "glb") || files[0];
+      const stl = files.find((file) => String(file.Type).toLowerCase() === "stl");
+      return {
+        status: done.Status,
+        glbUrl: glb?.Url || "",
+        stlUrl: stl?.Url || "",
+        error: done.ErrorMessage || "",
+        raw: done
+      };
+    }
+  },
+  {
+    id: "local",
+    label: "自定义/本地 API",
+    costLabel: () => "按你的接口计费或本地算力",
+    isConfigured: hasLocalProvider,
+    submit: submitLocalGeneration,
+    poll: pollLocalGeneration
+  }
+];
+
+function getProvider(id) {
+  return PROVIDERS.find((provider) => provider.id === id) || PROVIDERS[0];
+}
+
+
+/* src/mesh-tools.js */
+function getMeshStats(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  let faces = 0;
+  object.traverse((child) => {
+    if (!child.isMesh || !child.geometry) return;
+    const geometry = child.geometry;
+    if (geometry.index) faces += geometry.index.count / 3;
+    else faces += geometry.attributes.position.count / 3;
+  });
+  return { box, size, faces: Math.round(faces) };
+}
+
+function scaleObjectToSize(object, axis, targetSizeMm) {
+  const { size } = getMeshStats(object);
+  const source = axis === "max" ? Math.max(size.x, size.y, size.z) : size[axis];
+  if (!source || !Number.isFinite(source)) return null;
+  const scale = Number(targetSizeMm) / source;
+  object.scale.multiplyScalar(scale);
+  centerObject(object);
+  return getMeshStats(object);
+}
+
+function centerObject(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const center = box.getCenter(new THREE.Vector3());
+  object.position.sub(center);
+  const nextBox = new THREE.Box3().setFromObject(object);
+  object.position.y -= nextBox.min.y;
+}
+
+function inspectWatertight(object) {
+  const edgeMap = new Map();
+  let triangles = 0;
+  object.updateMatrixWorld(true);
+  object.traverse((child) => {
+    if (!child.isMesh || !child.geometry?.attributes?.position) return;
+    const geometry = child.geometry.index ? child.geometry.toNonIndexed() : child.geometry.clone();
+    const positions = geometry.attributes.position;
+    const matrix = child.matrixWorld;
+    for (let i = 0; i < positions.count; i += 3) {
+      triangles += 1;
+      const a = vertexKey(positions, i, matrix);
+      const b = vertexKey(positions, i + 1, matrix);
+      const c = vertexKey(positions, i + 2, matrix);
+      addEdge(edgeMap, a, b);
+      addEdge(edgeMap, b, c);
+      addEdge(edgeMap, c, a);
+    }
+    geometry.dispose();
+  });
+  let openEdges = 0;
+  let nonManifoldEdges = 0;
+  edgeMap.forEach((count) => {
+    if (count === 1) openEdges += 1;
+    if (count > 2) nonManifoldEdges += 1;
+  });
+  return {
+    triangles,
+    openEdges,
+    nonManifoldEdges,
+    watertight: triangles > 0 && openEdges === 0 && nonManifoldEdges === 0
+  };
+}
+
+function cleanGeometry(object) {
+  object.traverse((child) => {
+    if (!child.isMesh || !child.geometry) return;
+    child.geometry.computeVertexNormals();
+    child.geometry.computeBoundingBox();
+    child.geometry.computeBoundingSphere();
+  });
+  return inspectWatertight(object);
+}
+
+function exportBinaryStl(object) {
+  const exporter = new STLExporter();
+  return exporter.parse(object, { binary: true });
+}
+
+async function createCardReliefMesh(imageDataUrl, options = {}) {
+  const widthMm = Number(options.widthMm) || 63;
+  const baseMm = Number(options.baseMm) || 1.6;
+  const reliefMm = Number(options.reliefMm) || 1.2;
+  const borderMm = Number(options.borderMm) || 2;
+  const borderHeightMm = Number(options.borderHeightMm) || 0.8;
+  const samplesX = Number(options.samplesX) || 180;
+  const image = await loadImage(imageDataUrl);
+  const aspect = image.naturalHeight / image.naturalWidth;
+  const samplesY = Math.max(16, Math.round(samplesX * aspect));
+  const heightMm = widthMm * aspect;
+  const height = imageToHeightMap(image, samplesX, samplesY, widthMm, heightMm, baseMm, reliefMm, borderMm, borderHeightMm);
+  const geometry = heightMapToGeometry(height, widthMm, heightMm);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xd8d1bd,
+    vertexColors: true,
+    side: THREE.DoubleSide,
+    roughness: 0.72,
+    metalness: 0.02
+  });
+  return new THREE.Mesh(geometry, material);
+}
+
+function addEdge(edgeMap, left, right) {
+  const key = left < right ? `${left}|${right}` : `${right}|${left}`;
+  edgeMap.set(key, (edgeMap.get(key) || 0) + 1);
+}
+
+function vertexKey(attribute, index, matrix) {
+  const v = new THREE.Vector3().fromBufferAttribute(attribute, index).applyMatrix4(matrix);
+  return `${round(v.x)},${round(v.y)},${round(v.z)}`;
+}
+
+function round(value) {
+  return Math.round(value * 100000) / 100000;
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function imageToHeightMap(image, samplesX, samplesY, widthMm, heightMm, baseMm, reliefMm, borderMm, borderHeightMm) {
+  const canvas = document.createElement("canvas");
+  canvas.width = samplesX;
+  canvas.height = samplesY;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(image, 0, 0, samplesX, samplesY);
+  const { data } = ctx.getImageData(0, 0, samplesX, samplesY);
+  const height = new Float32Array(samplesX * samplesY);
+  const colors = new Float32Array(samplesX * samplesY * 3);
+  for (let y = 0; y < samplesY; y += 1) {
+    for (let x = 0; x < samplesX; x += 1) {
+      const index = (y * samplesX + x) * 4;
+      const r = data[index] / 255;
+      const g = data[index + 1] / 255;
+      const b = data[index + 2] / 255;
+      const a = data[index + 3] / 255;
+      const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      const raised = Math.pow((1 - luminance) * a, 1.25);
+      height[y * samplesX + x] = baseMm + raised * reliefMm;
+      const colorIndex = (y * samplesX + x) * 3;
+      colors[colorIndex] = mix(0.82, r, a);
+      colors[colorIndex + 1] = mix(0.78, g, a);
+      colors[colorIndex + 2] = mix(0.66, b, a);
+    }
+  }
+  addRim(height, samplesX, samplesY, widthMm, heightMm, borderMm, borderHeightMm);
+  return { data: height, colors, cols: samplesX, rows: samplesY };
+}
+
+function addRim(height, cols, rows, widthMm, heightMm, borderMm, borderHeightMm) {
+  const borderX = Math.max(1, Math.round(cols * borderMm / widthMm));
+  const borderY = Math.max(1, Math.round(rows * borderMm / heightMm));
+  const border = Math.min(borderX, borderY);
+  for (let y = 0; y < rows; y += 1) {
+    for (let x = 0; x < cols; x += 1) {
+      const dist = Math.min(x, cols - 1 - x, y, rows - 1 - y);
+      const rim = Math.max(0, Math.min(1, (border - dist) / border));
+      height[y * cols + x] += Math.sqrt(rim) * borderHeightMm;
+    }
+  }
+}
+
+function heightMapToGeometry(height, widthMm, heightMm) {
+  const { data, colors, cols, rows } = height;
+  const vertices = [];
+  const vertexColors = [];
+  const indices = [];
+
+  for (let y = 0; y < rows; y += 1) {
+    const z = heightMm / 2 - (y / (rows - 1)) * heightMm;
+    for (let x = 0; x < cols; x += 1) {
+      const px = -widthMm / 2 + (x / (cols - 1)) * widthMm;
+      vertices.push(px, data[y * cols + x], z);
+      const colorIndex = (y * cols + x) * 3;
+      vertexColors.push(colors[colorIndex], colors[colorIndex + 1], colors[colorIndex + 2]);
+    }
+  }
+  const bottomOffset = rows * cols;
+  for (let y = 0; y < rows; y += 1) {
+    const z = heightMm / 2 - (y / (rows - 1)) * heightMm;
+    for (let x = 0; x < cols; x += 1) {
+      const px = -widthMm / 2 + (x / (cols - 1)) * widthMm;
+      vertices.push(px, 0, z);
+      vertexColors.push(0.55, 0.52, 0.44);
+    }
+  }
+
+  for (let y = 0; y < rows - 1; y += 1) {
+    for (let x = 0; x < cols - 1; x += 1) {
+      const a = y * cols + x;
+      const b = a + 1;
+      const c = a + cols;
+      const d = c + 1;
+      indices.push(a, b, c, b, d, c);
+      indices.push(bottomOffset + a, bottomOffset + c, bottomOffset + b, bottomOffset + b, bottomOffset + c, bottomOffset + d);
+    }
+  }
+
+  for (let x = 0; x < cols - 1; x += 1) {
+    addQuad(indices, x, x + 1, bottomOffset + x + 1, bottomOffset + x);
+    const topA = (rows - 1) * cols + x;
+    addQuad(indices, topA + 1, topA, bottomOffset + topA, bottomOffset + topA + 1);
+  }
+  for (let y = 0; y < rows - 1; y += 1) {
+    const left = y * cols;
+    addQuad(indices, left + cols, left, bottomOffset + left, bottomOffset + left + cols);
+    const right = y * cols + cols - 1;
+    addQuad(indices, right, right + cols, bottomOffset + right + cols, bottomOffset + right);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("color", new THREE.Float32BufferAttribute(vertexColors, 3));
+  geometry.setIndex(indices);
+  return geometry;
+}
+
+function addQuad(indices, a, b, c, d) {
+  indices.push(a, b, c, a, c, d);
+}
+
+function mix(left, right, amount) {
+  return left + (right - left) * amount;
+}
+
+
+/* src/app.js */
+const state = {
+  referenceImage: null,
+  referenceName: "",
+  modelObject: null,
+  modelName: "",
+  wireframe: false
+};
+const LOCAL_API_PRESETS = {
+  "local-default": {
+    label: "通用本地生成服务",
+    hint: "适合你自己写的 FastAPI/Flask 服务。通常只需要确认服务地址，提交和查询路径会自动套用本工作台协议。",
+    endpoint: "http://localhost:8000",
+    submitPath: "/generate",
+    taskPath: "/tasks/{taskId}",
+    authHeaderName: "",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint"]
+  },
+  "hunyuan3d-local": {
+    label: "本地 Hunyuan3D 包装服务",
+    hint: "适合把开源 Hunyuan3D 模型包成 HTTP 服务。默认按本工作台的生成协议提交图片和轮询任务。",
+    endpoint: "http://localhost:8000",
+    submitPath: "/generate",
+    taskPath: "/tasks/{taskId}",
+    authHeaderName: "",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint"]
+  },
+  "comfyui-proxy": {
+    label: "ComfyUI 包装代理",
+    hint: "浏览器不能直接按本工作台格式调用原生 ComfyUI 队列接口，建议用一个小代理转换图片、工作流和结果地址。",
+    endpoint: "http://localhost:8000",
+    submitPath: "/generate",
+    taskPath: "/tasks/{taskId}",
+    authHeaderName: "",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint"]
+  },
+  "sd-webui-proxy": {
+    label: "SD WebUI / TripoSR 包装代理",
+    hint: "适合把 SD WebUI、TripoSR 或 InstantMesh 包成统一接口。一般只需要服务地址，路径由代理负责。",
+    endpoint: "http://localhost:8000",
+    submitPath: "/generate",
+    taskPath: "/tasks/{taskId}",
+    authHeaderName: "",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint"]
+  },
+  "openai-compatible": {
+    label: "OpenAI 兼容 3D 代理",
+    hint: "适合云端或局域网代理，通常需要服务地址和 API Key。接口路径可按服务文档调整。",
+    endpoint: "https://api.example.com",
+    submitPath: "/v1/generate-3d",
+    taskPath: "/v1/tasks/{taskId}",
+    authHeaderName: "Authorization",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint", "submitPath", "taskPath", "authHeaderName", "authToken", "authScheme"]
+  },
+  custom: {
+    label: "完全自定义 HTTP 接口",
+    hint: "适合已有接口路径和认证方式都不固定的服务。这里会显示全部字段，按你的后端文档填写。",
+    endpoint: "http://localhost:8000",
+    submitPath: "/generate",
+    taskPath: "/tasks/{taskId}",
+    authHeaderName: "",
+    authScheme: "Bearer",
+    visibleFields: ["endpoint", "submitPath", "taskPath", "authHeaderName", "authToken", "authScheme"]
+  }
+};
+
+const el = {
+  shell: document.querySelector("#tdStudio"),
+  grid: document.querySelector(".td-grid"),
+  tabs: [...document.querySelectorAll("[data-tab]")],
+  panels: [...document.querySelectorAll("[data-panel]")],
+  imageDrop: document.querySelector("#imageDrop"),
+  imageInput: document.querySelector("#imageInput"),
+  imagePreview: document.querySelector("#imagePreview"),
+  providerSelect: document.querySelector("#providerSelect"),
+  modelVersion: document.querySelector("#modelVersion"),
+  generateType: document.querySelector("#generateType"),
+  faceCount: document.querySelector("#faceCount"),
+  costHint: document.querySelector("#costHint"),
+  submitJob: document.querySelector("#submitJob"),
+  createRelief: document.querySelector("#createRelief"),
+  reliefWidth: document.querySelector("#reliefWidth"),
+  reliefHeight: document.querySelector("#reliefHeight"),
+  jobStatus: document.querySelector("#jobStatus"),
+  viewport: document.querySelector("#viewport"),
+  modelInput: document.querySelector("#modelInput"),
+  resetView: document.querySelector("#resetView"),
+  toggleWire: document.querySelector("#toggleWire"),
+  loadSample: document.querySelector("#loadSample"),
+  metricName: document.querySelector("#metricName"),
+  metricSize: document.querySelector("#metricSize"),
+  metricFaces: document.querySelector("#metricFaces"),
+  checkMesh: document.querySelector("#checkMesh"),
+  repairMesh: document.querySelector("#repairMesh"),
+  repairStatus: document.querySelector("#repairStatus"),
+  scaleAxis: document.querySelector("#scaleAxis"),
+  targetSize: document.querySelector("#targetSize"),
+  applyScale: document.querySelector("#applyScale"),
+  exportStl: document.querySelector("#exportStl"),
+  keyState: document.querySelector("#keyState"),
+  secretIdInput: document.querySelector("#secretIdInput"),
+  secretKeyInput: document.querySelector("#secretKeyInput"),
+  localPresetSelect: document.querySelector("#localPresetSelect"),
+  localPresetHint: document.querySelector("#localPresetHint"),
+  localEndpointInput: document.querySelector("#localEndpointInput"),
+  localSubmitPathInput: document.querySelector("#localSubmitPathInput"),
+  localTaskPathInput: document.querySelector("#localTaskPathInput"),
+  localAuthHeaderInput: document.querySelector("#localAuthHeaderInput"),
+  localAuthTokenInput: document.querySelector("#localAuthTokenInput"),
+  localAuthSchemeInput: document.querySelector("#localAuthSchemeInput"),
+  localFields: [...document.querySelectorAll("[data-local-field]")],
+  localContractTitle: document.querySelector("#localContractTitle"),
+  localContractSubmit: document.querySelector("#localContractSubmit"),
+  localContractTask: document.querySelector("#localContractTask"),
+  saveConfig: document.querySelector("#saveConfig"),
+  clearConfig: document.querySelector("#clearConfig"),
+  showHistory: document.querySelector("#showHistory"),
+  historyList: document.querySelector("#historyList"),
+  toggleHistory: document.querySelector("#toggleHistory"),
+  clearHistory: document.querySelector("#clearHistory"),
+  template: document.querySelector("#historyItemTemplate")
+};
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xfff4df);
+
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 5000);
+camera.position.set(80, 70, 100);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.35;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+el.viewport.appendChild(renderer.domElement);
+
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+const hemi = new THREE.HemisphereLight(0xffffff, 0xd9c09a, 2.8);
+scene.add(hemi);
+const ambient = new THREE.AmbientLight(0xfff2df, 0.72);
+scene.add(ambient);
+const key = new THREE.DirectionalLight(0xffffff, 3.1);
+key.position.set(60, 90, 30);
+key.castShadow = true;
+key.shadow.mapSize.set(1024, 1024);
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xd9fff1, 1.5);
+fill.position.set(-70, 45, -80);
+scene.add(fill);
+const front = new THREE.DirectionalLight(0xfff1dc, 1.3);
+front.position.set(0, 35, 120);
+scene.add(front);
+const grid = new THREE.GridHelper(170, 17, 0xcaa86e, 0xe8d7b7);
+scene.add(grid);
+
+const loaders = {
+  glb: new GLTFLoader(),
+  gltf: new GLTFLoader(),
+  stl: new STLLoader(),
+  obj: new OBJLoader()
+};
+
+init();
+
+async function init() {
+  if (new URLSearchParams(location.search).get("mode") === "panel") {
+    el.shell.classList.add("is-panel");
+  }
+
+  bindTabs();
+  bindUploads();
+  bindActions();
+  await loadConfigForm();
+  updateCost();
+  updateKeyState();
+  await renderHistory();
+  loadSampleModel();
+  postHost("td:ready", { version: "0.1.0" });
+  window.addEventListener("resize", resize);
+  resize();
+  animate();
+}
+
+function bindTabs() {
+  el.tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      el.tabs.forEach((item) => item.classList.toggle("is-active", item === tab));
+      el.panels.forEach((panel) => panel.classList.toggle("is-active", panel.dataset.panel === tab.dataset.tab));
+    });
+  });
+}
+
+function bindUploads() {
+  el.imageInput.addEventListener("change", () => loadReferenceImage(el.imageInput.files[0]));
+  ["dragenter", "dragover"].forEach((type) => {
+    el.imageDrop.addEventListener(type, (event) => {
+      event.preventDefault();
+      el.imageDrop.classList.add("is-dragging");
+    });
+  });
+  ["dragleave", "drop"].forEach((type) => {
+    el.imageDrop.addEventListener(type, () => el.imageDrop.classList.remove("is-dragging"));
+  });
+  el.imageDrop.addEventListener("drop", (event) => {
+    event.preventDefault();
+    loadReferenceImage(event.dataTransfer.files[0]);
+  });
+
+  el.modelInput.addEventListener("change", () => loadModelFile(el.modelInput.files[0]));
+  el.viewport.addEventListener("dragover", (event) => event.preventDefault());
+  el.viewport.addEventListener("drop", (event) => {
+    event.preventDefault();
+    loadModelFile(event.dataTransfer.files[0]);
+  });
+}
+
+function bindActions() {
+  el.generateType.addEventListener("change", updateCost);
+  el.providerSelect.addEventListener("change", () => {
+    updateCost();
+    updateKeyState();
+  });
+  el.localPresetSelect.addEventListener("change", () => applyLocalPreset(el.localPresetSelect.value));
+  [el.localSubmitPathInput, el.localTaskPathInput].forEach((input) => {
+    input.addEventListener("input", () => updateLocalPresetUi(el.localPresetSelect.value));
+  });
+  el.submitJob.addEventListener("click", submitJob);
+  el.createRelief.addEventListener("click", createReliefCard);
+  el.resetView.addEventListener("click", frameObject);
+  el.toggleWire.addEventListener("click", toggleWireframe);
+  el.loadSample.addEventListener("click", loadSampleModel);
+  el.checkMesh.addEventListener("click", checkMesh);
+  el.repairMesh.addEventListener("click", repairMesh);
+  el.applyScale.addEventListener("click", applyScale);
+  el.exportStl.addEventListener("click", exportStl);
+  el.saveConfig.addEventListener("click", saveRuntimeConfig);
+  el.clearConfig.addEventListener("click", clearRuntimeConfig);
+  el.clearHistory.addEventListener("click", async () => {
+    el.clearHistory.disabled = true;
+    try {
+      await clearHistory();
+      await renderHistory();
+      setJobStatus("生成历史已从本机缓存清空。");
+    } catch (error) {
+      setJobStatus(`${error.message} 已先清空当前浏览器历史。`, true);
+      await renderHistory();
+    } finally {
+      el.clearHistory.disabled = false;
+    }
+  });
+  el.toggleHistory.addEventListener("click", toggleHistoryPanel);
+  el.showHistory.addEventListener("click", toggleHistoryPanel);
+
+  window.addEventListener("message", (event) => {
+    const message = event.data || {};
+    if (message.type === "td:setTheme") document.documentElement.classList.toggle("light", !message.payload?.dark);
+    if (message.type === "td:loadFile" && message.payload?.file) loadModelFile(message.payload.file);
+  });
+}
+
+async function loadReferenceImage(file) {
+  if (!file) return;
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type)) return setJobStatus("参考图格式需要是 jpg、png 或 webp。", true);
+  if (file.size > 6 * 1024 * 1024) return setJobStatus("参考图超过 6MB，请压缩后再上传。", true);
+  const dataUrl = await readAsDataUrl(file);
+  const dimensions = await readImageDimensions(dataUrl);
+  if (Math.min(dimensions.width, dimensions.height) < 128 || Math.max(dimensions.width, dimensions.height) > 5000) {
+    return setJobStatus("图片单边需要在 128 到 5000px 之间。", true);
+  }
+  state.referenceImage = dataUrl;
+  state.referenceName = file.name;
+  el.imagePreview.src = dataUrl;
+  el.imageDrop.classList.add("has-image");
+  setJobStatus(`已载入参考图：${file.name}`);
+}
+
+async function submitJob() {
+  if (!state.referenceImage) return setJobStatus("请先上传参考图。", true);
+  const provider = getProvider(el.providerSelect.value);
+  if (!provider.isConfigured()) return setJobStatus(`${provider.label} 还没有配置好。可以先拖入本地模型预览，或切换其他生成源。`, true);
+
+  el.submitJob.disabled = true;
+  try {
+    setJobStatus(`正在提交到${provider.label}...`);
+    const submit = await provider.submit({
+      imageDataUrl: state.referenceImage,
+      imageName: state.referenceName,
+      options: getGenerationOptions()
+    });
+    const taskId = submit.taskId;
+    setJobStatus(`已提交：${taskId}，开始轮询状态。`);
+    const done = await provider.poll(taskId, (status) => {
+      const progress = Number(status.progress || 0);
+      setJobStatus(progress ? `任务状态：${status.status || status.Status}，${progress}%` : `任务状态：${status.status || status.Status}`);
+    });
+    if (done.status === "FAIL" || done.Status === "FAIL") throw new Error(done.error || "生成任务失败。");
+    await addHistory({
+      provider: provider.id,
+      jobId: taskId,
+      name: state.referenceName,
+      glbUrl: done.glbUrl || "",
+      stlUrl: done.stlUrl || "",
+      source: state.referenceImage
+    });
+    await renderHistory();
+    postHost("td:generated", { jobId: taskId, glbName: done.glbUrl || "", stlName: done.stlUrl || "" });
+    if (done.glbUrl) await loadModelUrl(done.glbUrl, `${provider.id}-${taskId}.glb`);
+    else if (done.stlUrl) await loadModelUrl(done.stlUrl, `${provider.id}-${taskId}.stl`);
+    setJobStatus("生成完成。请及时下载保存模型文件。");
+  } catch (error) {
+    setJobStatus(error.message, true);
+    postHost("td:error", { code: error.code || "GENERATION_ERROR", message: error.message });
+  } finally {
+    el.submitJob.disabled = false;
+  }
+}
+
+async function createReliefCard() {
+  if (!state.referenceImage) return setJobStatus("请先上传卡牌图片。", true);
+  el.createRelief.disabled = true;
+  try {
+    setJobStatus("正在把图片转换成卡牌浮雕模型...");
+    const mesh = await createCardReliefMesh(state.referenceImage, {
+      widthMm: Number(el.reliefWidth.value) || 63,
+      reliefMm: Number(el.reliefHeight.value) || 1.2,
+      baseMm: 1.6,
+      borderMm: 2,
+      borderHeightMm: 0.8,
+      samplesX: 180
+    });
+    const name = `${safeName(state.referenceName || "card")}-relief.stl`;
+    setModel(mesh, name);
+    const previewTab = el.tabs.find((tab) => tab.dataset.tab === "preview");
+    previewTab?.click();
+    setJobStatus("浮雕卡牌已生成。到“导出”页点击导出 STL 即可打印。");
+  } catch (error) {
+    setJobStatus(`浮雕生成失败：${error.message}`, true);
+  } finally {
+    el.createRelief.disabled = false;
+  }
+}
+
+function getGenerationOptions() {
+  return {
+    model: el.modelVersion.value,
+    generateType: el.generateType.value,
+    faceCount: el.faceCount.value
+  };
+}
+
+async function loadModelFile(file) {
+  if (!file) return;
+  const ext = extension(file.name);
+  if (!loaders[ext]) return;
+  const url = URL.createObjectURL(file);
+  try {
+    await loadModelUrl(url, file.name);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+async function loadModelUrl(url, name) {
+  const ext = extension(name) || extension(new URL(url, location.href).pathname);
+  if (ext === "glb" || ext === "gltf") {
+    const gltf = await loaders.glb.loadAsync(url);
+    setModel(gltf.scene, name);
+  } else if (ext === "stl") {
+    const geometry = await loaders.stl.loadAsync(url);
+    const mesh = new THREE.Mesh(geometry, defaultMaterial());
+    setModel(mesh, name, { preserveMaterial: true, autoStand: false });
+  } else if (ext === "obj") {
+    const object = await loaders.obj.loadAsync(url);
+    setModel(object, name, { fallbackMissingMaterial: true });
+  }
+}
+
+function setModel(object, name, options = {}) {
+  if (state.modelObject) scene.remove(state.modelObject);
+  state.modelObject = object;
+  state.modelName = name;
+  prepareModelForPreview(object, options);
+  object.traverse((child) => {
+    if (!child.isMesh) return;
+    child.castShadow = true;
+    child.receiveShadow = true;
+    if (!child.material) child.material = defaultMaterial();
+  });
+  scene.add(object);
+  centerObject(object);
+  resize();
+  frameObject();
+  updateMetrics();
+  setRepairStatus("模型已加载，可以检测水密性。");
+}
+
+function prepareModelForPreview(object, options = {}) {
+  if (options.forceDefaultMaterial) setObjectMaterial(object, defaultMaterial);
+  else normalizePreviewMaterials(object, options);
+  if (options.autoStand !== false) autoStandObject(object);
+}
+
+function autoStandObject(object) {
+  object.updateMatrixWorld(true);
+  let box = new THREE.Box3().setFromObject(object);
+  let size = box.getSize(new THREE.Vector3());
+  const maxHorizontal = Math.max(size.x, size.z);
+
+  if (size.y >= maxHorizontal * 0.75) return;
+
+  if (size.x >= size.z) object.rotation.z += Math.PI / 2;
+  else object.rotation.x -= Math.PI / 2;
+
+  centerObject(object);
+}
+
+function loadSampleModel() {
+  const group = new THREE.Group();
+  const baseMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe8d3a7,
+    roughness: 0.78,
+    metalness: 0.02
+  });
+  const robeMaterial = new THREE.MeshStandardMaterial({
+    color: 0x7fb06a,
+    roughness: 0.82,
+    metalness: 0.01
+  });
+  const skinMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffd8b8,
+    roughness: 0.74,
+    metalness: 0
+  });
+  const hairMaterial = new THREE.MeshStandardMaterial({
+    color: 0x4a392a,
+    roughness: 0.86,
+    metalness: 0
+  });
+  const leafMaterial = new THREE.MeshStandardMaterial({
+    color: 0x4fa487,
+    roughness: 0.78,
+    metalness: 0.01
+  });
+  const cinnabarMaterial = new THREE.MeshStandardMaterial({
+    color: 0xc84f3d,
+    roughness: 0.76,
+    metalness: 0.01
+  });
+  const inkMaterial = new THREE.MeshStandardMaterial({
+    color: 0x38281f,
+    roughness: 0.68,
+    metalness: 0
+  });
+
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(31, 36, 8, 64), baseMaterial);
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(18, 24, 12, 32), robeMaterial);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(22, 48, 28), skinMaterial);
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(22.8, 48, 18, 0, Math.PI * 2, 0, Math.PI * .48), hairMaterial);
+  const bun = new THREE.Mesh(new THREE.SphereGeometry(7, 24, 16), hairMaterial);
+  const leaf = new THREE.Mesh(new THREE.SphereGeometry(10, 24, 12), leafMaterial);
+  const nameSeal = new THREE.Mesh(new THREE.BoxGeometry(20, 5, 2.4), cinnabarMaterial);
+  const belt = new THREE.Mesh(new THREE.TorusGeometry(18.8, 1.5, 12, 64), cinnabarMaterial);
+
+  const eyeLeft = new THREE.Mesh(new THREE.SphereGeometry(2.2, 16, 10), inkMaterial);
+  const eyeRight = eyeLeft.clone();
+  const cheekLeft = new THREE.Mesh(new THREE.SphereGeometry(2.9, 16, 10), cinnabarMaterial);
+  const cheekRight = cheekLeft.clone();
+  const armLeft = new THREE.Mesh(new THREE.CapsuleGeometry(4.8, 14, 8, 16), robeMaterial);
+  const armRight = armLeft.clone();
+
+  base.position.y = 4;
+  body.position.y = 28;
+  head.position.y = 63;
+  hair.position.y = 69;
+  bun.position.set(0, 88, -2);
+  leaf.position.set(8, 92, 0);
+  leaf.scale.set(1.5, .45, .85);
+  leaf.rotation.z = -0.55;
+  nameSeal.position.set(0, 38, 18.8);
+  belt.position.y = 27;
+  belt.rotation.x = Math.PI / 2;
+  eyeLeft.position.set(-7, 65, 19.4);
+  eyeRight.position.set(7, 65, 19.4);
+  cheekLeft.position.set(-12, 59, 18.4);
+  cheekRight.position.set(12, 59, 18.4);
+  cheekLeft.scale.set(1.35, .72, .45);
+  cheekRight.scale.copy(cheekLeft.scale);
+  armLeft.position.set(-18, 32, 3);
+  armRight.position.set(18, 32, 3);
+  armLeft.rotation.z = 0.42;
+  armRight.rotation.z = -0.42;
+
+  group.add(base, body, head, hair, bun, leaf, nameSeal, belt, eyeLeft, eyeRight, cheekLeft, cheekRight, armLeft, armRight);
+  setModel(group, "baicaoxing-q-print-form.stl", { autoStand: false });
+}
+
+function defaultMaterial() {
+  return new THREE.MeshStandardMaterial({
+    color: 0xf0d8ad,
+    emissive: 0x2a170d,
+    emissiveIntensity: 0.05,
+    roughness: 0.78,
+    metalness: 0.01,
+    side: THREE.DoubleSide
+  });
+}
+
+function setObjectMaterial(object, materialFactory) {
+  object.traverse((child) => {
+    if (!child.isMesh) return;
+    child.material = materialFactory(child);
+  });
+}
+
+function normalizePreviewMaterials(object, options = {}) {
+  object.traverse((child) => {
+    if (!child.isMesh) return;
+    if (child.geometry) {
+      child.geometry.computeVertexNormals();
+      child.geometry.computeBoundingBox();
+      child.geometry.computeBoundingSphere();
+    }
+
+    const materials = normalizeMaterialList(child.material);
+    if (!materials.length) {
+      child.material = defaultMaterial();
+      return;
+    }
+
+    const nextMaterials = materials.map((material) => {
+      if (options.fallbackMissingMaterial && !material) return defaultMaterial();
+      if (!material) return defaultMaterial();
+      prepareTextureColorSpace(material);
+
+      if (materialNeedsPreviewFallback(material, child.geometry)) {
+        return defaultMaterial();
+      }
+
+      material.side = THREE.DoubleSide;
+      material.needsUpdate = true;
+      return material;
+    });
+
+    child.material = Array.isArray(child.material) ? nextMaterials : nextMaterials[0];
+  });
+}
+
+function normalizeMaterialList(material) {
+  if (Array.isArray(material)) return material;
+  return material ? [material] : [];
+}
+
+function prepareTextureColorSpace(material) {
+  ["map", "emissiveMap"].forEach((key) => {
+    if (material[key]) material[key].colorSpace = THREE.SRGBColorSpace;
+  });
+}
+
+function materialNeedsPreviewFallback(material, geometry) {
+  const hasVisibleTexture = material.map || material.emissiveMap;
+  const hasVertexColors = Boolean(geometry?.attributes?.color);
+  if (hasVisibleTexture || hasVertexColors) return false;
+  if (!material.color) return false;
+
+  const brightness = material.color.r + material.color.g + material.color.b;
+  const opacity = material.opacity ?? 1;
+  return opacity > 0.01 && brightness < 0.08;
+}
+
+function toggleWireframe() {
+  state.wireframe = !state.wireframe;
+  state.modelObject?.traverse((child) => {
+    if (!child.isMesh || !child.material) return;
+    normalizeMaterialList(child.material).forEach((material) => {
+      material.wireframe = state.wireframe;
+    });
+  });
+}
+
+function checkMesh() {
+  if (!state.modelObject) return setRepairStatus("请先加载模型。", true);
+  const result = inspectWatertight(state.modelObject);
+  setRepairStatus(result.watertight
+    ? `检测通过：${result.triangles} 个三角面，没有发现开放边。`
+    : `检测未通过：开放边 ${result.openEdges}，非流形边 ${result.nonManifoldEdges}。`);
+}
+
+function repairMesh() {
+  if (!state.modelObject) return setRepairStatus("请先加载模型。", true);
+  const result = cleanGeometry(state.modelObject);
+  setRepairStatus(result.watertight
+    ? "已清理法线和包围盒，当前边计数显示水密。"
+    : `已完成基础清理，但仍有开放边 ${result.openEdges}。后续可接入 manifold3d WASM 做真正 Make Manifold。`);
+  updateMetrics();
+}
+
+function applyScale() {
+  if (!state.modelObject) return;
+  const stats = scaleObjectToSize(state.modelObject, el.scaleAxis.value, Number(el.targetSize.value));
+  if (stats) updateMetrics(stats);
+}
+
+function exportStl() {
+  if (!state.modelObject) return;
+  const result = exportBinaryStl(state.modelObject);
+  const blob = result instanceof Blob ? result : new Blob([result], { type: "model/stl" });
+  const filename = `${safeName(state.modelName || "td-model")}.stl`;
+  downloadBlob(blob, filename);
+  const stats = getMeshStats(state.modelObject);
+  postHost("td:exported", { stlName: filename, sizeMM: vectorText(stats.size) });
+}
+
+function updateMetrics(stats = getMeshStats(state.modelObject)) {
+  el.metricName.textContent = state.modelName || "未命名模型";
+  el.metricSize.textContent = vectorText(stats.size);
+  el.metricFaces.textContent = stats.faces.toLocaleString("zh-CN");
+}
+
+function frameObject() {
+  if (!state.modelObject) return;
+  const box = new THREE.Box3().setFromObject(state.modelObject);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z, 1);
+  const distance = maxDim / Math.tan((camera.fov * Math.PI) / 360);
+  camera.position.set(center.x + distance * .7, center.y + distance * .55, center.z + distance * .8);
+  camera.near = Math.max(distance / 1000, .01);
+  camera.far = distance * 20;
+  camera.updateProjectionMatrix();
+  controls.target.copy(center);
+  controls.update();
+}
+
+function resize() {
+  const rect = el.viewport.getBoundingClientRect();
+  renderer.setSize(rect.width, rect.height, false);
+  camera.aspect = rect.width / Math.max(rect.height, 1);
+  camera.updateProjectionMatrix();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+async function renderHistory() {
+  const history = await readHistory();
+  el.historyList.replaceChildren();
+  if (!history.length) {
+    const empty = document.createElement("p");
+    empty.className = "td-status";
+    empty.textContent = "生成完成后会在这里保留最近 20 条记录。";
+    el.historyList.append(empty);
+    return;
+  }
+  history.forEach((item) => {
+    const node = el.template.content.firstElementChild.cloneNode(true);
+    node.querySelector("strong").textContent = item.name || item.jobId || "未命名任务";
+    node.querySelector("small").textContent = item.jobId ? `JobId ${item.jobId}` : new Date(item.savedAt).toLocaleString();
+    const thumb = node.querySelector(".td-thumb");
+    if (item.source) thumb.style.backgroundImage = `url("${item.source}")`;
+    thumb.style.backgroundSize = "cover";
+    node.addEventListener("click", () => {
+      if (item.glbUrl) loadModelUrl(item.glbUrl, `${item.jobId}.glb`);
+      else if (item.stlUrl) loadModelUrl(item.stlUrl, `${item.jobId}.stl`);
+    });
+    el.historyList.append(node);
+  });
+}
+
+function updateCost() {
+  const provider = getProvider(el.providerSelect.value);
+  el.costHint.textContent = `预计消耗：${provider.costLabel(el.generateType.value)}`;
+}
+
+function updateKeyState() {
+  const provider = getProvider(el.providerSelect.value);
+  el.keyState.textContent = provider.isConfigured()
+    ? `当前生成源可用：${provider.label}。`
+    : `当前生成源未配置：${provider.label}。请在下面选择接口类型，页面会只显示需要填写的信息。`;
+}
+
+async function loadConfigForm() {
+  const fileConfig = window.TD_STUDIO_CONFIG || {};
+  const savedConfig = await readRuntimeConfig({});
+  const config = {
+    ...fileConfig,
+    ...savedConfig,
+    localProvider: {
+      ...(fileConfig.localProvider || {}),
+      ...(savedConfig.localProvider || {})
+    }
+  };
+  const localProvider = config.localProvider || {};
+  el.secretIdInput.value = config.tencentSecretId || "";
+  el.secretKeyInput.value = config.tencentSecretKey || "";
+  el.localPresetSelect.value = localProvider.apiPreset || "local-default";
+  el.localEndpointInput.value = localProvider.endpoint || "http://localhost:8000";
+  el.localSubmitPathInput.value = localProvider.submitPath || "/generate";
+  el.localTaskPathInput.value = localProvider.taskPath || "/tasks/{taskId}";
+  el.localAuthHeaderInput.value = localProvider.authHeaderName || "";
+  el.localAuthTokenInput.value = localProvider.authToken || "";
+  el.localAuthSchemeInput.value = localProvider.authScheme ?? "Bearer";
+  updateLocalPresetUi(el.localPresetSelect.value);
+}
+
+async function saveRuntimeConfig() {
+  const config = {
+    tencentSecretId: el.secretIdInput.value.trim(),
+    tencentSecretKey: el.secretKeyInput.value.trim(),
+    localProvider: {
+      apiPreset: el.localPresetSelect.value,
+      endpoint: el.localEndpointInput.value.trim() || "http://localhost:8000",
+      submitPath: el.localSubmitPathInput.value.trim() || "/generate",
+      taskPath: el.localTaskPathInput.value.trim() || "/tasks/{taskId}",
+      authHeaderName: el.localAuthHeaderInput.value.trim(),
+      authToken: el.localAuthTokenInput.value.trim(),
+      authScheme: el.localAuthSchemeInput.value.trim(),
+      pollIntervalMs: 3000
+    }
+  };
+
+  el.saveConfig.disabled = true;
+  try {
+    const persisted = await writeRuntimeConfig(config);
+    updateKeyState();
+    updateCost();
+    setJobStatus(persisted
+      ? "配置已保存到本机 CSV 和当前浏览器，下次打开会自动读取。"
+      : "配置已保存到当前浏览器。直接双击打开时不会写入 local-data 文件夹。");
+  } catch (error) {
+    updateKeyState();
+    updateCost();
+    setJobStatus(`${error.message} 已先保存到当前浏览器。`, true);
+  } finally {
+    el.saveConfig.disabled = false;
+  }
+}
+
+function applyLocalPreset(presetId) {
+  const preset = getLocalPreset(presetId);
+  el.localEndpointInput.value = preset.endpoint;
+  el.localSubmitPathInput.value = preset.submitPath;
+  el.localTaskPathInput.value = preset.taskPath;
+  el.localAuthHeaderInput.value = preset.authHeaderName;
+  el.localAuthSchemeInput.value = preset.authScheme;
+  if (!preset.visibleFields.includes("authToken")) el.localAuthTokenInput.value = "";
+  updateLocalPresetUi(presetId);
+  updateKeyState();
+}
+
+function updateLocalPresetUi(presetId) {
+  const preset = getLocalPreset(presetId);
+  const visible = new Set(preset.visibleFields);
+  el.localPresetHint.textContent = preset.hint;
+  el.localFields.forEach((field) => {
+    field.hidden = !visible.has(field.dataset.localField);
+  });
+  el.localContractTitle.textContent = `${preset.label}需要填写`;
+  el.localContractSubmit.textContent = `提交：POST ${el.localSubmitPathInput.value || preset.submitPath}`;
+  el.localContractTask.textContent = `查询：GET ${el.localTaskPathInput.value || preset.taskPath}`;
+}
+
+function getLocalPreset(presetId) {
+  return LOCAL_API_PRESETS[presetId] || LOCAL_API_PRESETS["local-default"];
+}
+
+async function clearRuntimeConfig() {
+  el.clearConfig.disabled = true;
+  try {
+    const persisted = await writeRuntimeConfig({});
+    await loadConfigForm();
+    updateKeyState();
+    setJobStatus(persisted ? "本机 CSV 和浏览器配置已清空。" : "浏览器配置已清空。");
+  } catch (error) {
+    await loadConfigForm();
+    updateKeyState();
+    setJobStatus(`${error.message} 浏览器配置已先清空。`, true);
+  } finally {
+    el.clearConfig.disabled = false;
+  }
+}
+
+function toggleHistoryPanel() {
+  const collapsed = el.grid.classList.toggle("history-collapsed");
+  el.toggleHistory.textContent = collapsed ? "展开" : "收起";
+  requestAnimationFrame(() => {
+    resize();
+    frameObject();
+  });
+}
+
+function setJobStatus(message, isError = false) {
+  el.jobStatus.textContent = message;
+  el.jobStatus.style.color = isError ? "var(--danger)" : "";
+}
+
+function setRepairStatus(message, isError = false) {
+  el.repairStatus.textContent = message;
+  el.repairStatus.style.color = isError ? "var(--danger)" : "";
+}
+
+function readAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+function readImageDimensions(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve({ width: image.naturalWidth, height: image.naturalHeight });
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function extension(name) {
+  return String(name || "").split("?")[0].split(".").pop().toLowerCase();
+}
+
+function vectorText(size) {
+  return `${size.x.toFixed(1)} x ${size.y.toFixed(1)} x ${size.z.toFixed(1)} mm`;
+}
+
+function safeName(name) {
+  return String(name).replace(/\.[^.]+$/, "").replace(/[^a-z0-9\u4e00-\u9fa5_-]+/gi, "-").slice(0, 64) || "td-model";
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function postHost(type, payload) {
+  window.parent?.postMessage({ type, payload }, "*");
+}
+
+  </script>
+</body>
+</html>

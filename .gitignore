@@ -1,0 +1,15 @@
+# 密钥与本地配置，绝不随文件分发
+config.local.js
+.env
+local-data/
+
+# 生成产物
+*.glb
+*.stl
+*.obj
+local-providers/*/inputs/
+local-providers/*/outputs/
+local-providers/*/.venv/
+local-providers/*/TripoSR/
+__pycache__/
+*.pyc

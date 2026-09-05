@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>百草姓 3D 萌物工坊</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <script>
+    if (location.protocol === "file:" && !location.pathname.endsWith("standalone.html")) {
+      location.replace("./standalone.html" + location.search + location.hash);
+    }
+  </script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+      }
+    }
+  </script>
+  <script src="./config.local.js"></script>
+</head>
+<body>
+  <main class="td-shell" id="tdStudio">
+    <header class="td-topbar" data-standalone>
+      <div>
+        <p class="td-kicker">Baicaoxing 3D Atelier</p>
+        <h1>百草姓 3D 萌物工坊</h1>
+        <p class="td-subtitle">把草木灵感、姓氏小像和卡牌浮雕，变成可以预览、修复与打印的 Q 版模型。</p>
+      </div>
+      <a class="td-link-button" href="https://3d.hunyuan.tencent.com" target="_blank" rel="noreferrer">混元 3D 入口</a>
+    </header>
+
+    <section class="td-grid">
+      <aside class="td-panel td-controls">
+        <nav class="td-tabs" aria-label="工作区">
+          <button class="is-active" data-tab="generate">生成</button>
+          <button data-tab="preview">预览</button>
+          <button data-tab="repair">修复</button>
+          <button data-tab="export">导出</button>
+          <button data-tab="settings">设置</button>
+        </nav>
+
+        <section class="td-tab-panel is-active" data-panel="generate">
+          <label class="td-dropzone" id="imageDrop">
+            <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp">
+            <span>放入一张百草小像参考图</span>
+            <small>jpg / png / webp，单边 128~5000px，最大 6MB</small>
+            <img id="imagePreview" alt="">
+          </label>
+
+          <div class="td-form-grid">
+            <label>生成源
+              <select id="providerSelect">
+                <option value="hunyuan">混元 API</option>
+                <option value="local">自定义/本地 API</option>
+              </select>
+            </label>
+            <label>模型版本
+              <select id="modelVersion">
+                <option value="3.1">3.1</option>
+                <option value="3.0">3.0</option>
+              </select>
+            </label>
+            <label>生成类型
+              <select id="generateType">
+                <option value="Geometry">Geometry 白模，15 积分</option>
+                <option value="Normal">Normal 纹理，25 积分</option>
+                <option value="LowPoly">LowPoly，30 积分</option>
+              </select>
+            </label>
+            <label>面数
+              <input id="faceCount" type="number" min="3000" max="1500000" step="1000" value="100000">
+            </label>
+            <label>目标结果
+              <input value="GLB + STL" disabled>
+            </label>
+          </div>
+
+          <div class="td-cost" id="costHint">预计消耗：15 积分</div>
+          <button class="td-primary" id="submitJob">提交生成</button>
+          <div class="td-relief-box">
+            <strong>百草卡牌浮雕</strong>
+            <div class="td-form-grid">
+              <label>卡宽 mm
+                <input id="reliefWidth" type="number" min="20" max="180" step="1" value="63">
+              </label>
+              <label>浮雕高度 mm
+                <input id="reliefHeight" type="number" min="0.2" max="5" step="0.1" value="1.2">
+              </label>
+            </div>
+            <button id="createRelief">生成浮雕卡牌</button>
+          </div>
+          <p class="td-status" id="jobStatus">等待参考图。可以先用示例模型看看预览效果。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="preview">
+          <label class="td-file-row">
+            加载模型文件
+            <input id="modelInput" type="file" accept=".glb,.gltf,.stl,.obj,model/gltf-binary">
+          </label>
+          <div class="td-actions">
+            <button id="resetView" title="重置视角">重置视角</button>
+            <button id="toggleWire" title="切换线框">线框</button>
+            <button id="loadSample" title="载入示例几何">百草示例</button>
+          </div>
+          <dl class="td-metrics">
+            <div><dt>文件</dt><dd id="metricName">未加载</dd></div>
+            <div><dt>包围盒</dt><dd id="metricSize">-</dd></div>
+            <div><dt>三角面</dt><dd id="metricFaces">-</dd></div>
+          </dl>
+        </section>
+
+        <section class="td-tab-panel" data-panel="repair">
+          <div class="td-actions">
+            <button id="checkMesh">水密检测</button>
+            <button id="repairMesh">一键修复</button>
+          </div>
+          <p class="td-status" id="repairStatus">加载模型后可检测。浏览器版 manifold 修复预留，当前先提供边计数检测与几何清理。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="export">
+          <div class="td-form-grid">
+            <label>定尺寸轴
+              <select id="scaleAxis">
+                <option value="y">高度 Y</option>
+                <option value="x">宽度 X</option>
+                <option value="z">深度 Z</option>
+                <option value="max">最长边</option>
+              </select>
+            </label>
+            <label>目标尺寸 mm
+              <input id="targetSize" type="number" min="1" step="1" value="50">
+            </label>
+          </div>
+          <div class="td-actions">
+            <button id="applyScale">应用缩放</button>
+            <button class="td-primary" id="exportStl">导出 STL</button>
+          </div>
+          <p class="td-status">FDM 0.4mm 以下细节通常打不出；空壳模型打印前需要确认壁厚。</p>
+        </section>
+
+        <section class="td-tab-panel" data-panel="settings">
+          <div class="td-settings">
+            <p id="keyState">正在检查配置...</p>
+            <div class="td-config-box">
+              <strong>混元 API</strong>
+              <label>SecretId
+                <input id="secretIdInput" type="password" autocomplete="off" placeholder="腾讯云 CAM SecretId">
+              </label>
+              <label>SecretKey
+                <input id="secretKeyInput" type="password" autocomplete="off" placeholder="腾讯云 CAM SecretKey">
+              </label>
+            </div>
+            <div class="td-config-box">
+              <strong>自定义/本地 API</strong>
+              <label>接口类型
+                <select id="localPresetSelect">
+                  <option value="local-default">通用本地生成服务</option>
+                  <option value="hunyuan3d-local">本地 Hunyuan3D 包装服务</option>
+                  <option value="comfyui-proxy">ComfyUI 包装代理</option>
+                  <option value="sd-webui-proxy">SD WebUI / TripoSR 包装代理</option>
+                  <option value="openai-compatible">OpenAI 兼容 3D 代理</option>
+                  <option value="custom">完全自定义 HTTP 接口</option>
+                </select>
+              </label>
+              <p class="td-field-hint" id="localPresetHint"></p>
+              <label data-local-field="endpoint">服务地址
+                <input id="localEndpointInput" autocomplete="off" placeholder="http://localhost:8000 或 https://api.example.com">
+              </label>
+              <label data-local-field="submitPath">提交接口
+                <input id="localSubmitPathInput" autocomplete="off" placeholder="/generate">
+              </label>
+              <label data-local-field="taskPath">查询接口
+                <input id="localTaskPathInput" autocomplete="off" placeholder="/tasks/{taskId}">
+              </label>
+              <label data-local-field="authHeaderName">认证 Header 名
+                <input id="localAuthHeaderInput" autocomplete="off" placeholder="Authorization 或 X-API-Key">
+              </label>
+              <label data-local-field="authToken">API Key / Token
+                <input id="localAuthTokenInput" type="password" autocomplete="off" placeholder="你的接口密钥">
+              </label>
+              <label data-local-field="authScheme">认证前缀
+                <input id="localAuthSchemeInput" autocomplete="off" placeholder="Bearer；使用 X-API-Key 时可留空">
+              </label>
+            </div>
+            <div class="td-actions">
+              <button class="td-primary" id="saveConfig">保存配置</button>
+              <button id="clearConfig">清空浏览器配置</button>
+            </div>
+            <p>双击 <code>standalone.html</code> 打开时，配置和生成历史会保存在当前浏览器；通过启动脚本打开时，还会同步保存到本机 <code>local-data</code>。如果你要分享文件夹，请不要带上 <code>local-data</code> 或密钥文件。</p>
+            <div class="td-local-contract">
+              <strong id="localContractTitle">当前接口需要填写</strong>
+              <span id="localContractSubmit">POST /generate</span>
+              <span id="localContractTask">GET /tasks/{taskId}</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="td-stage">
+        <div class="td-toolbar">
+          <strong id="stageTitle">萌物预览</strong>
+          <span id="stageBadge">GLB / STL / OBJ</span>
+          <button id="showHistory" class="td-history-restore" title="展开生成历史">展开历史</button>
+        </div>
+        <div id="viewport" class="td-viewport" aria-label="3D 模型预览"></div>
+      </section>
+
+      <aside class="td-panel td-history-panel" id="historyPanel">
+        <div class="td-history-head">
+          <strong>生成历史</strong>
+          <div class="td-history-tools">
+            <button id="toggleHistory" title="收起/展开历史">收起</button>
+            <button id="clearHistory">清空</button>
+          </div>
+        </div>
+        <div id="historyList" class="td-history-list"></div>
+      </aside>
+    </section>
+  </main>
+
+  <template id="historyItemTemplate">
+    <button class="td-history-item">
+      <span class="td-thumb"></span>
+      <span>
+        <strong></strong>
+        <small></small>
+      </span>
+    </button>
+  </template>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
